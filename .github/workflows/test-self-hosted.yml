@@ -1,0 +1,27 @@
+name: Test Self-Hosted Runner
+
+on:
+  workflow_dispatch:      # run manually
+  push:
+    branches: [ main ]    # also run on pushes to main
+
+jobs:
+  test-runner:
+    runs-on: self-hosted   # this makes it run on your Azure VM
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Show basic info
+        run: |
+          echo "Runner name: $RUNNER_NAME"
+          echo "Runner OS: $RUNNER_OS"
+          echo "Runner workspace: $GITHUB_WORKSPACE"
+
+      - name: Run test script with secret
+        env:
+          MY_SECRET_TOKEN: ${{ secrets.MY_SECRET_TOKEN }}
+        run: |
+          chmod +x scripts/test_runner.sh
+          ./scripts/test_runner.sh
