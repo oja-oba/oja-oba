@@ -1,27 +1,41 @@
-name: Test Self-Hosted Runner
+name: Run code from branch (no Node)
 
 on:
-  workflow_dispatch:      # run manually
+  workflow_dispatch:
   push:
-    branches: [ main ]    # also run on pushes to main
+    branches: [ main ]
 
 jobs:
-  test-runner:
-    runs-on: self-hosted   # this makes it run on your Azure VM
+  run-on-vm:
+    runs-on: self-hosted
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Show basic info
+      - name: Show context
         run: |
-          echo "Runner name: $RUNNER_NAME"
-          echo "Runner OS: $RUNNER_OS"
-          echo "Runner workspace: $GITHUB_WORKSPACE"
+          echo "Ref: $GITHUB_REF"
+          echo "Branch: $GITHUB_REF_NAME"
+          echo "Commit: $GITHUB_SHA"
 
-      - name: Run test script with secret
+      - name: Clone this repo/branch manually
         env:
-          MY_SECRET_TOKEN: ${{ secrets.MY_SECRET_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          chmod +x scripts/test_runner.sh
-          ./scripts/test_runner.sh
+          # Clean previous clone
+          rm -rf repo
+
+          # Clone using the built-in GITHUB_TOKEN (no extra secrets needed)
+          git clone https://x-access-token:${GITHUB_TOKEN}@git@github.com:oja-oba/oja-oba.git repo
+
+          cd repo
+
+          # Check out the branch / commit that triggered the workflow
+          git fetch origin
+          git checkout "$GITHUB_REF_NAME"
+          git reset --hard "$GITHUB_SHA"
+
+          echo "Now at:"
+          git log -1 --oneline
+
+          # 👉 Run your real code here, for example:
+          # ./scripts/test_runner.sh
+          echo "Running code from branch $GITHUB_REF_NAME at commit $GITHUB_SHA"
