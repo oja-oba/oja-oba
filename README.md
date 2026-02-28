@@ -30,5 +30,6 @@ I am currently engineering a production-grade microservices environment that int
 - 📊 **Observable:** Setting up Grafana dashboards for real-time cluster metrics.
 
 ---
+![GitHub stats](https://github-readme-stats.vercel.app/api?username=oja-oba&show_icons=true&theme=radical)
 
 ### 📫 Connect with me
